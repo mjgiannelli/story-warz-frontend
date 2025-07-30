@@ -1,0 +1,50 @@
+import styles from "../login/loginView.module.scss";
+import { useNavigate } from "react-router-dom";
+import useSignUpViewController from "./signUpViewController";
+import swLogo from "../../assets/images/swLogo.png";
+
+const SignUpView: React.FC = () => {
+  const {
+    username,
+    password,
+    handleUsernameChange,
+    handlePasswordChange,
+    handleSignUp,
+  } = useSignUpViewController();
+
+  const navigate = useNavigate();
+
+  return (
+    <div className={styles.container}>
+      <p className={styles.swName} style={{ color: "white", fontFamily: "Bangers" }}>
+        <span style={{ color: "red" }}>STORY</span> WARZ
+      </p>
+      <img src={swLogo} alt="Logo" className={styles.logo} />
+      <div className={styles.card}>
+        <div className={styles.title}>Sign Up</div>
+        <input
+          className={styles.input}
+          type="text"
+          placeholder="Username"
+          value={username}
+          onChange={handleUsernameChange}
+        />
+        <input
+          className={styles.input}
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={handlePasswordChange}
+        />
+        <button className={styles.button} onClick={handleSignUp}>
+          Sign Up
+        </button>
+        <div className={styles.toggleText} onClick={() => navigate("/login")}>
+          Already have an account? Login
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default SignUpView;
