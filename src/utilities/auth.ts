@@ -53,7 +53,7 @@ class AuthService {
         localStorage.setItem('id_token', idToken);
         localStorage.setItem('refresh_token', refreshToken);
 
-        window.location.assign('/profile');
+        window.location.assign('/');
     }
 
     autoLogin(idToken: string, refreshToken: string, studentId: string) {

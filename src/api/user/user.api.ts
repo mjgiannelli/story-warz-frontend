@@ -24,4 +24,25 @@ export class UserAPI {
             }
         }
     }
+
+    public static async getProfile(userId: string) {
+        try {
+            const resp = await fetch(this.ravenURL + userId, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+            });
+    
+            const data = await resp.json();
+            
+            return data;
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                console.error('An error occurred:', error.message);
+                return { error: error.message }
+            }
+        }
+    }
 }
