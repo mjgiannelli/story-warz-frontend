@@ -1,5 +1,5 @@
-const LandingViewController = () => {
-    return;
+const useLandingViewController = () => {
+    return {};
 }
 
-export default LandingViewController;
+export default useLandingViewController;

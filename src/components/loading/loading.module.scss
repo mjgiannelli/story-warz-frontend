@@ -1,0 +1,26 @@
+.loading {
+    display: flex;
+    justify-content: center;
+    align-content: center;
+}
+
+.loadingSvg {
+    height: 10rem;
+    width: 10rem;
+    color: red;
+    animation: rotate360 2s linear infinite;
+}
+
+@keyframes rotate360 {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.swName {
+ font-size: 3rem;
+ margin-bottom: 1rem;                                               
+}

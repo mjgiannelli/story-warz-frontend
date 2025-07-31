@@ -7,8 +7,10 @@ const SignUpView: React.FC = () => {
   const {
     username,
     password,
+    displayName,
     handleUsernameChange,
     handlePasswordChange,
+    handleDisplayNameChange,
     handleSignUp,
   } = useSignUpViewController();
 
@@ -32,9 +34,16 @@ const SignUpView: React.FC = () => {
         <input
           className={styles.input}
           type="password"
-          placeholder="Password"
+          placeholder="Password - 8 chars"
           value={password}
           onChange={handlePasswordChange}
+        />
+        <input
+          className={styles.input}
+          type="text"
+          placeholder="Display Name"
+          value={displayName}
+          onChange={handleDisplayNameChange}
         />
         <button className={styles.button} onClick={handleSignUp}>
           Sign Up
