@@ -29,7 +29,6 @@ function App() {
               <LoadingComponent />
             ) : (
               <LandingView
-                setLoggedInUser={setLoggedInUser}
                 loggedInUser={loggedInUser}
               />
             )
@@ -39,7 +38,6 @@ function App() {
           path="/login"
           element={
             <LoginView
-              setLoggedInUser={setLoggedInUser}
               loggedInUser={loggedInUser}
             />
           }

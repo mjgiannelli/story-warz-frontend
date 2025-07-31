@@ -5,7 +5,7 @@ import gdLogo from "../../assets/images/gdLogo.png";
 import swLogo from "../../assets/images/swLogo.png";
 import { NavProps } from "../../App.interface";
 
-const LandingView: React.FC<NavProps> = ({ setLoggedInUser, loggedInUser }) => {
+const LandingView: React.FC<NavProps> = ({ loggedInUser }) => {
   const navigate = useNavigate();
 
   useEffect(() => {

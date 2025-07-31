@@ -6,6 +6,5 @@ export interface LoggedInUserProps {
 }
 
 export interface NavProps {
-  setLoggedInUser: React.Dispatch<React.SetStateAction<LoggedInUserProps | undefined | null>>;
   loggedInUser: LoggedInUserProps | undefined | null;
 }

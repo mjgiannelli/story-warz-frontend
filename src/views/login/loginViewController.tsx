@@ -4,7 +4,6 @@ import { AuthAPI } from "../../api/auth/auth.api";
 import { LoggedInUserProps } from "../../App.interface";
 
 const useLoginViewController = (
-  setLoggedInUser: React.Dispatch<React.SetStateAction<LoggedInUserProps | undefined | null>>,
   loggedInUser: LoggedInUserProps | undefined | null
 ) => {
   const [loading, setLoading] = useState<boolean>(false);
@@ -71,7 +70,6 @@ const useLoginViewController = (
     handleUsernameChange,
     handlePasswordChange,
     handleLogin,
-    setLoading,
     errorMessage,
     loading,
   };

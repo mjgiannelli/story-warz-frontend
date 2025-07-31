@@ -5,7 +5,7 @@ import swLogo from "../../assets/images/swLogo.png";
 import LoadingComponent from "../../components/loading/loading";
 import { NavProps } from "../../App.interface";
 
-const LoginView: React.FC<NavProps> = ({setLoggedInUser, loggedInUser}) => {
+const LoginView: React.FC<NavProps> = ({ loggedInUser}) => {
   const {
     username,
     password,
@@ -14,7 +14,7 @@ const LoginView: React.FC<NavProps> = ({setLoggedInUser, loggedInUser}) => {
     handleLogin,
     errorMessage,
     loading,
-  } = useLoginViewController(setLoggedInUser, loggedInUser);
+  } = useLoginViewController( loggedInUser);
 
   const navigate = useNavigate();
 
