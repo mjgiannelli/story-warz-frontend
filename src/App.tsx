@@ -38,37 +38,72 @@ function App() {
     setLoggedInUser(loggedInUser);
   }, []);
 
+  if(loggedInUser === undefined) return (<LoadingComponent />);
+
   return (
-    <SocketProvider>
-      <Router>
-        <Routes>
-          <Route
-            path="/"
-            element={
-              loggedInUser === undefined ? (
-                <LoadingComponent />
-              ) : (
-                <LandingView loggedInUser={loggedInUser} />
-              )
-            }
-          />
-          <Route
-            path="/login"
-            element={<LoginView loggedInUser={loggedInUser} />}
-          />
-          <Route path="/sign-up" element={<SignUpView />} />
-          <Route
-            path="/profile"
-            element={
-              <ProtectedRoute user={loggedInUser}>
-                <ProfileView loggedInUser={loggedInUser} />
-              </ProtectedRoute>
-            }
-          />
-          {/* <Route path="*" element={<NotFound />} /> */}
-        </Routes>
-      </Router>
-    </SocketProvider>
+    <>
+      {!loggedInUser ? (
+        <Router>
+          <Routes>
+            <Route
+              path="/"
+              element={
+                loggedInUser === undefined ? (
+                  <LoadingComponent />
+                ) : (
+                  <LandingView loggedInUser={loggedInUser} />
+                )
+              }
+            />
+            <Route
+              path="/login"
+              element={<LoginView loggedInUser={loggedInUser} />}
+            />
+            <Route path="/sign-up" element={<SignUpView />} />
+            <Route
+              path="/profile"
+              element={
+                <ProtectedRoute user={loggedInUser}>
+                  <ProfileView loggedInUser={loggedInUser} />
+                </ProtectedRoute>
+              }
+            />
+            {/* <Route path="*" element={<NotFound />} /> */}
+          </Routes>
+        </Router>
+      ) : (
+        <SocketProvider>
+          <Router>
+            <Routes>
+              <Route
+                path="/"
+                element={
+                  loggedInUser === undefined ? (
+                    <LoadingComponent />
+                  ) : (
+                    <LandingView loggedInUser={loggedInUser} />
+                  )
+                }
+              />
+              <Route
+                path="/login"
+                element={<LoginView loggedInUser={loggedInUser} />}
+              />
+              <Route path="/sign-up" element={<SignUpView />} />
+              <Route
+                path="/profile"
+                element={
+                  <ProtectedRoute user={loggedInUser}>
+                    <ProfileView loggedInUser={loggedInUser} />
+                  </ProtectedRoute>
+                }
+              />
+              {/* <Route path="*" element={<NotFound />} /> */}
+            </Routes>
+          </Router>
+        </SocketProvider>
+      )}
+    </>
   );
 }
 

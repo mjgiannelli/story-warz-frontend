@@ -1,49 +1,103 @@
-// socketContext.tsx
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  useMemo,
+} from "react";
 import { io, Socket } from "socket.io-client";
 import Auth from "../utilities/auth";
 
-const SocketContext = createContext<Socket | null>(null);
-const OnlineUsersContext = createContext<string[]>([]); // 👈 New context
+// ---------------------------
+// Types
+// ---------------------------
+interface OnlineUser {
+  socketId: string;
+  userId: string;
+  username: string;
+  displayName: string;
+}
 
-export const useSocket = () => useContext(SocketContext)!;
-export const useOnlineUsers = () => useContext(OnlineUsersContext); // 👈 Export hook
+interface SocketContextType {
+  socket: Socket | null;
+  onlineUsers: OnlineUser[];
+  disconnectSocket: () => void;
+}
 
+// ---------------------------
+// Context Setup
+// ---------------------------
+const SocketContext = createContext<SocketContextType | null>(null);
+
+export const useSocketContext = () => {
+  const context = useContext(SocketContext);
+  if (!context)
+    throw new Error(
+      "useSocketContext must be used within a <SocketProvider />"
+    );
+  return context;
+};
+
+// ---------------------------
+// Provider Component
+// ---------------------------
 export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
   const [socket, setSocket] = useState<Socket | null>(null);
-  const [onlineUsers, setOnlineUsers] = useState<string[]>([]); // 👈 Hold state
+  const [onlineUsers, setOnlineUsers] = useState<OnlineUser[]>([]);
+  const disconnectSocket = () => {
+    if (socket) {
+      socket.disconnect();
+      setSocket(null);
+      console.log("🔌 Socket disconnected manually.");
+    }
+  };
 
   useEffect(() => {
-    console.log("📡 Attempting socket connection...");
     const loggedInUser = Auth.loggedIn();
-    if (loggedInUser) {
-      const newSocket = io("http://localhost:3000", {
-        transports: ["websocket"],
-      });
-
-      setSocket(newSocket);
-
-      newSocket.on("connect", () => {
-        console.log("🟢 Connected to socket:", newSocket.id);
-        newSocket.emit("joinLobby", "lobby-1"); // centralize emit here too
-      });
-
-      newSocket.on("onlineUsers", (users: string[]) => {
-        console.log("📡 Received online users in context:", users);
-        setOnlineUsers(users);
-      });
-
-      return () => {
-        newSocket.disconnect();
-      };
+    if (!loggedInUser) {
+      console.log("🔒 Not logged in, socket not initialized.");
+      return;
     }
+
+    console.log("📡 Attempting socket connection...");
+    const socketInstance = io("http://localhost:3000");
+
+    socketInstance.on("connect", () => {
+      console.log("🟢 Connected to socket:", socketInstance.id);
+
+      // Send user profile to server
+      const userProfile = {
+        userId: loggedInUser.userId,
+        username: loggedInUser.userName,
+        displayName: loggedInUser.displayName,
+      };
+
+      socketInstance.emit("registerUser", userProfile);
+      socketInstance.emit("joinLobby", "lobby-1"); // auto join lobby
+    });
+
+    socketInstance.on("onlineUsers", (users: OnlineUser[]) => {
+      console.log("📥 Received onlineUsers:", users);
+      setOnlineUsers(users);
+    });
+
+    setSocket(socketInstance);
+
+    return () => {
+      socketInstance.disconnect();
+    };
   }, []);
 
+  const contextValue = useMemo(
+    () => ({ socket, onlineUsers, disconnectSocket }),
+    [socket, onlineUsers]
+  );
+
+  if (!socket) return null;
+
   return (
-    <SocketContext.Provider value={socket}>
-      <OnlineUsersContext.Provider value={onlineUsers}>
-        {children}
-      </OnlineUsersContext.Provider>
+    <SocketContext.Provider value={contextValue}>
+      {children}
     </SocketContext.Provider>
   );
 };

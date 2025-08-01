@@ -1,8 +1,7 @@
-// LobbyView.tsx
-import { useOnlineUsers } from "../../context/socketContext";
+import { useSocketContext } from "../../context/socketContext";
 
 const LobbyView = () => {
-  const onlineUsers = useOnlineUsers();
+  const { onlineUsers } = useSocketContext();
 
   return (
     <div>
@@ -10,8 +9,10 @@ const LobbyView = () => {
       <div>
         <h4>Online Players</h4>
         <ul>
-          {onlineUsers.map((userId) => (
-            <li key={userId}>{userId}</li>
+          {onlineUsers.map((user) => (
+            <li key={user.socketId}>
+              <strong>{user.displayName} ({user.username})</strong> 
+            </li>
           ))}
         </ul>
       </div>

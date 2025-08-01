@@ -9,7 +9,7 @@ import { useEffect } from "react";
 import socket from "../../socket/socket";
 
 const ProfileView: React.FC<NavProps> = ({ loggedInUser }) => {
-  const { profile, errorMessage, loading } =
+  const { profile, errorMessage, loading, handleLogout } =
     useProfileViewController(loggedInUser);
   return (
     <>
@@ -28,6 +28,7 @@ const ProfileView: React.FC<NavProps> = ({ loggedInUser }) => {
               <h2>{profile?.displayName}</h2>
               <p>@{profile?.username}</p>
             </div>
+            <button className={styles.logoutButton} onClick={handleLogout}>Logout</button>
           </div>
 
           {/* Friends Section */}

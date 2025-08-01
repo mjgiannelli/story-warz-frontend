@@ -68,15 +68,18 @@ class AuthService {
         localStorage.setItem('id_token', idToken)
     }
 
-    async logout() {
+    async logout(onLogoutCallback?: () => void) {
         const loggedInUser = this.getProfile('id_token');
 
         if (loggedInUser) {
             localStorage.removeItem('id_token');
-            localStorage.removeItem('refresh_token')
-            localStorage.removeItem('studentId')
+            localStorage.removeItem('refresh_token');
 
-            window.location.assign('/');
+            if (onLogoutCallback) {
+                onLogoutCallback(); // 👈 e.g. disconnectSocket()
+            }
+
+            window.location.assign('/login');
         }
     }
     checkLoggedIn() {

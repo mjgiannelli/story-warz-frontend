@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { LoggedInUserProps } from "../../App.interface";
 import { UserDTO } from "../../api/user/user.interface";
 import { UserAPI } from "../../api/user/user.api";
+import { useSocketContext } from "../../context/socketContext";
+import Auth from '../../utilities/auth';
 
 const useProfileViewController = (
   loggedInUser: LoggedInUserProps | undefined | null
@@ -11,6 +13,13 @@ const useProfileViewController = (
   const [errorMessage, setErrorMessage] = useState<string | undefined>(
     undefined
   );
+  const { disconnectSocket } = useSocketContext();
+
+  const handleLogout = () => {
+    Auth.logout(() => {
+      disconnectSocket();
+    });
+  };
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -27,7 +36,7 @@ const useProfileViewController = (
     };
     fetchProfile();
   }, []);
-  return { profile, errorMessage, loading };
+  return { profile, errorMessage, loading, handleLogout };
 };
 
 export default useProfileViewController;
