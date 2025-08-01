@@ -4,11 +4,13 @@ import styles from "./profileView.module.scss";
 import placeholderImage from "../../assets/images/placeholderImg.png";
 import { randomUUID } from "crypto";
 import LoadingComponent from "../../components/loading/loading";
+import LobbyView from "../../components/lobby/lobby";
+import { useEffect } from "react";
+import socket from "../../socket/socket";
 
 const ProfileView: React.FC<NavProps> = ({ loggedInUser }) => {
   const { profile, errorMessage, loading } =
     useProfileViewController(loggedInUser);
-  console.log("profile: ", profile);
   return (
     <>
       {loading ? (
@@ -54,9 +56,7 @@ const ProfileView: React.FC<NavProps> = ({ loggedInUser }) => {
           {/* Game Lobby Section */}
           <div className={styles.section}>
             <h3>Game Lobby</h3>
-            <div className={styles.lobbyPlaceholder}>
-              <p>Join a game, start a new story, or invite friends!</p>
-            </div>
+            <LobbyView />
           </div>
         </div>
       )}

@@ -13,10 +13,8 @@ const useProfileViewController = (
   );
 
   useEffect(() => {
-    console.log("logged in user: ", loggedInUser);
     const fetchProfile = async () => {
       const resp = await UserAPI.getProfile(loggedInUser?.userId as string);
-      console.log("resp: ", resp);
       if (resp.id) {
         setProfile(resp);
         setLoading(false);
