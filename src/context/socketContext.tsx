@@ -8,10 +8,7 @@ import React, {
 import { io, Socket } from "socket.io-client";
 import Auth from "../utilities/auth";
 
-// ---------------------------
-// Types
-// ---------------------------
-interface OnlineUser {
+export interface OnlineUser {
   socketId: string;
   userId: string;
   username: string;
@@ -24,9 +21,6 @@ interface SocketContextType {
   disconnectSocket: () => void;
 }
 
-// ---------------------------
-// Context Setup
-// ---------------------------
 const SocketContext = createContext<SocketContextType | null>(null);
 
 export const useSocketContext = () => {
@@ -38,12 +32,10 @@ export const useSocketContext = () => {
   return context;
 };
 
-// ---------------------------
-// Provider Component
-// ---------------------------
 export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
   const [socket, setSocket] = useState<Socket | null>(null);
   const [onlineUsers, setOnlineUsers] = useState<OnlineUser[]>([]);
+
   const disconnectSocket = () => {
     if (socket) {
       socket.disconnect();
@@ -64,16 +56,13 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
 
     socketInstance.on("connect", () => {
       console.log("🟢 Connected to socket:", socketInstance.id);
-
-      // Send user profile to server
       const userProfile = {
         userId: loggedInUser.userId,
         username: loggedInUser.userName,
         displayName: loggedInUser.displayName,
       };
-
       socketInstance.emit("registerUser", userProfile);
-      socketInstance.emit("joinLobby", "lobby-1"); // auto join lobby
+      socketInstance.emit("joinLobby", "lobby-1");
     });
 
     socketInstance.on("onlineUsers", (users: OnlineUser[]) => {
@@ -82,7 +71,6 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
     });
 
     setSocket(socketInstance);
-
     return () => {
       socketInstance.disconnect();
     };
