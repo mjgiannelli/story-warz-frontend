@@ -4,6 +4,7 @@ import { useSocketContext, OnlineUser } from "../../context/socketContext";
 import { Book, LoggedInUserProps } from "../../App.interface";
 import { CreateGameDTO } from "../../api/game/game.interface";
 import { GameAPI } from "../../api/game/game.api";
+import { UserDTO } from "../../api/user/user.interface";
 
 interface GoogleBookVolumeInfo {
   title: string;
@@ -25,10 +26,9 @@ interface GoogleBooksApiResponse {
   items: GoogleBook[];
 }
 
-export const useLobbyViewController = (
-  loggedInUser: LoggedInUserProps | null | undefined
-) => {
-  const { socket, onlineUsers } = useSocketContext();
+export const useLobbyViewController = (loggedInUserData: UserDTO) => {
+  const { socket, onlineUsers, activeGames, currentGameId, joinGame } =
+    useSocketContext();
   const [showModal, setShowModal] = useState(false);
   const [topic, setTopic] = useState("");
   const [book, setBook] = useState<Book>();
@@ -60,13 +60,22 @@ export const useLobbyViewController = (
       book: book as Book,
       createdDate: new Date().toISOString(),
       topic: topic,
-      creatorId: loggedInUser?.userId as string,
+      creatorId: loggedInUserData?.id as string,
+      players: [loggedInUserData],
     };
     try {
       const res = await GameAPI.createGame(gameData);
-    console.log('create game res: ', res);
+      console.log("create game res: ", res);
       if (res?.id) {
         toast.success("Game created successfully!");
+        console.log("socket: ", socket);
+        socket?.emit("newGameCreated", {
+          gameId: res.id,
+          topic: topic,
+          hostDisplayName: loggedInUserData.displayName,
+        });
+        setTopic("");
+        setBook(undefined);
         setShowModal(false);
       } else {
         throw new Error("Failed to create game");
@@ -142,5 +151,7 @@ export const useLobbyViewController = (
     retreiveGoogleBook,
     bookLoading,
     createGameLoading,
+    activeGames,
+    joinGame,
   };
 };

@@ -1,3 +1,5 @@
+import { UserDTO } from "./api/user/user.interface";
+
 export interface LoggedInUserProps {
     loggedIn: boolean;
     userName?: string;
@@ -7,6 +9,10 @@ export interface LoggedInUserProps {
 
 export interface NavProps {
   loggedInUser: LoggedInUserProps | undefined | null;
+}
+
+export interface LobbyProps {
+  loggedInUserData: UserDTO
 }
 
 export interface Book {

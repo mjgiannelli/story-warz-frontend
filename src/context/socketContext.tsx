@@ -16,9 +16,17 @@ export interface OnlineUser {
   gameId?: string;
 }
 
+export interface ActiveGame {
+  gameId: string;
+  topic: string;
+  hostDisplayName: string;
+  players: string[];
+}
+
 interface SocketContextType {
   socket: Socket | null;
   onlineUsers: OnlineUser[];
+  activeGames: ActiveGame[];
   currentGameId: string | null;
   joinGame: (gameId: string) => void;
   disconnectSocket: () => void;
@@ -39,22 +47,47 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
   const [socket, setSocket] = useState<Socket | null>(null);
   const [onlineUsers, setOnlineUsers] = useState<OnlineUser[]>([]);
   const [currentGameId, setCurrentGameId] = useState<string | null>(null);
+  const [activeGames, setActiveGames] = useState<ActiveGame[]>([]);
 
   const disconnectSocket = () => {
     if (socket) {
       socket.disconnect();
       setSocket(null);
       setCurrentGameId(null);
+      setOnlineUsers([]);
+      setActiveGames([]);
       console.log("🔌 Socket disconnected manually.");
     }
   };
 
   const joinGame = (gameId: string) => {
-    if (!socket) return;
+    if (!socket || currentGameId) return;
     socket.emit("joinGame", gameId);
-    setCurrentGameId(gameId);
-    console.log(`🎮 Sent request to join game ${gameId}`);
+    // Delaying setCurrentGameId until server confirms
   };
+
+  useEffect(() => {
+    if (!socket) return;
+
+    // Confirmed game join from server
+    const handleGameJoined = (gameId: string) => {
+      console.log("✅ Confirmed joined game:", gameId);
+      setCurrentGameId(gameId);
+    };
+
+    const handleActiveGamesUpdate = (games: ActiveGame[]) => {
+      console.log("📥 Received activeGames:", games);
+      setActiveGames(games);
+    };
+
+    socket.on("gameJoined", handleGameJoined);
+    socket.on("activeGames", handleActiveGamesUpdate);
+
+    return () => {
+      socket.off("gameJoined", handleGameJoined);
+      socket.off("activeGames", handleActiveGamesUpdate);
+    };
+  }, [socket]);
 
   useEffect(() => {
     const loggedInUser = Auth.loggedIn();
@@ -93,6 +126,7 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
       socketInstance.disconnect();
       setCurrentGameId(null);
       setOnlineUsers([]);
+      setActiveGames([]);
     };
   }, []);
 
@@ -100,11 +134,12 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
     () => ({
       socket,
       onlineUsers,
+      activeGames,
       currentGameId,
       joinGame,
       disconnectSocket,
     }),
-    [socket, onlineUsers, currentGameId]
+    [socket, onlineUsers, activeGames, currentGameId]
   );
 
   if (!socket) return null;

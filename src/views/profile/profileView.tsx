@@ -7,6 +7,7 @@ import LoadingComponent from "../../components/loading/loading";
 import LobbyView from "../lobby/lobbyView";
 import { useEffect } from "react";
 import socket from "../../socket/socket";
+import { UserDTO } from "../../api/user/user.interface";
 
 const ProfileView: React.FC<NavProps> = ({ loggedInUser }) => {
   const { profile, errorMessage, loading, handleLogout } =
@@ -59,7 +60,7 @@ const ProfileView: React.FC<NavProps> = ({ loggedInUser }) => {
           {/* Game Lobby Section */}
           <div className={styles.section}>
             <h3>Game Lobby</h3>
-            <LobbyView loggedInUser={loggedInUser} />
+            <LobbyView loggedInUserData={profile as UserDTO} />
           </div>
         </div>
       )}

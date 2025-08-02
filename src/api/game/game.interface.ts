@@ -22,4 +22,5 @@ export interface CreateGameDTO {
     createdDate: string;     // ISO 8601 date string
     book: Book;
     creatorId: string;
+    players: UserDTO[];
 }
