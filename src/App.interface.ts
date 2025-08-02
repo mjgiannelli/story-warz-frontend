@@ -12,8 +12,11 @@ export interface NavProps {
 export interface Book {
   authors?: string[];
   description: string;
-  bookId: string; // GoogleBooks ID
   image?: string;
   title: string;
-  link?: string;
+}
+
+export interface UserScore {
+  userId: string;
+  points: number;
 }

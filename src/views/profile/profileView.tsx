@@ -4,7 +4,7 @@ import styles from "./profileView.module.scss";
 import placeholderImage from "../../assets/images/placeholderImg.png";
 import { randomUUID } from "crypto";
 import LoadingComponent from "../../components/loading/loading";
-import LobbyView from "../../components/lobby/lobby";
+import LobbyView from "../lobby/lobbyView";
 import { useEffect } from "react";
 import socket from "../../socket/socket";
 
@@ -28,7 +28,9 @@ const ProfileView: React.FC<NavProps> = ({ loggedInUser }) => {
               <h2>{profile?.displayName}</h2>
               <p>@{profile?.username}</p>
             </div>
-            <button className={styles.logoutButton} onClick={handleLogout}>Logout</button>
+            <button className={styles.logoutButton} onClick={handleLogout}>
+              Logout
+            </button>
           </div>
 
           {/* Friends Section */}
@@ -57,7 +59,7 @@ const ProfileView: React.FC<NavProps> = ({ loggedInUser }) => {
           {/* Game Lobby Section */}
           <div className={styles.section}>
             <h3>Game Lobby</h3>
-            <LobbyView />
+            <LobbyView loggedInUser={loggedInUser} />
           </div>
         </div>
       )}

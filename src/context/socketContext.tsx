@@ -13,11 +13,14 @@ export interface OnlineUser {
   userId: string;
   username: string;
   displayName: string;
+  gameId?: string;
 }
 
 interface SocketContextType {
   socket: Socket | null;
   onlineUsers: OnlineUser[];
+  currentGameId: string | null;
+  joinGame: (gameId: string) => void;
   disconnectSocket: () => void;
 }
 
@@ -35,13 +38,22 @@ export const useSocketContext = () => {
 export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
   const [socket, setSocket] = useState<Socket | null>(null);
   const [onlineUsers, setOnlineUsers] = useState<OnlineUser[]>([]);
+  const [currentGameId, setCurrentGameId] = useState<string | null>(null);
 
   const disconnectSocket = () => {
     if (socket) {
       socket.disconnect();
       setSocket(null);
+      setCurrentGameId(null);
       console.log("🔌 Socket disconnected manually.");
     }
+  };
+
+  const joinGame = (gameId: string) => {
+    if (!socket) return;
+    socket.emit("joinGame", gameId);
+    setCurrentGameId(gameId);
+    console.log(`🎮 Sent request to join game ${gameId}`);
   };
 
   useEffect(() => {
@@ -70,15 +82,29 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
       setOnlineUsers(users);
     });
 
+    socketInstance.on("playerRejoinedGame", (user: OnlineUser) => {
+      console.log(`🔁 Rejoined game ${user.gameId}`);
+      setCurrentGameId(user.gameId || null);
+    });
+
     setSocket(socketInstance);
+
     return () => {
       socketInstance.disconnect();
+      setCurrentGameId(null);
+      setOnlineUsers([]);
     };
   }, []);
 
   const contextValue = useMemo(
-    () => ({ socket, onlineUsers, disconnectSocket }),
-    [socket, onlineUsers]
+    () => ({
+      socket,
+      onlineUsers,
+      currentGameId,
+      joinGame,
+      disconnectSocket,
+    }),
+    [socket, onlineUsers, currentGameId]
   );
 
   if (!socket) return null;
