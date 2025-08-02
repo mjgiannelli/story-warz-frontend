@@ -13,7 +13,7 @@ const useProfileViewController = (
   const [errorMessage, setErrorMessage] = useState<string | undefined>(
     undefined
   );
-  const { disconnectSocket } = useSocketContext();
+  const { disconnectSocket, currentGameId } = useSocketContext();
 
   const handleLogout = () => {
     Auth.logout(() => {
@@ -36,7 +36,7 @@ const useProfileViewController = (
     };
     fetchProfile();
   }, []);
-  return { profile, errorMessage, loading, handleLogout };
+  return { profile, errorMessage, loading, handleLogout, currentGameId };
 };
 
 export default useProfileViewController;

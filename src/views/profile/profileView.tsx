@@ -8,14 +8,17 @@ import LobbyView from "../lobby/lobbyView";
 import { useEffect } from "react";
 import socket from "../../socket/socket";
 import { UserDTO } from "../../api/user/user.interface";
+import GameView from "../game/gameView";
 
 const ProfileView: React.FC<NavProps> = ({ loggedInUser }) => {
-  const { profile, errorMessage, loading, handleLogout } =
+  const { profile, errorMessage, loading, handleLogout, currentGameId } =
     useProfileViewController(loggedInUser);
   return (
     <>
       {loading ? (
         <LoadingComponent />
+      ) : currentGameId ? (
+        <GameView loggedInUserData={profile as UserDTO} />
       ) : (
         <div className={styles.profileContainer}>
           {/* Profile Header */}

@@ -88,6 +88,8 @@
   border-radius: 10px;
   width: 90%;
   max-width: 500px;
+  max-height: 60vh;
+  overflow: scroll;
   text-align: center;
   box-shadow: 0 0 20px rgba(255, 46, 46, 0.4);
 }

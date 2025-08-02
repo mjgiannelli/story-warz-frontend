@@ -20,6 +20,7 @@ const LobbyView: React.FC<LobbyProps> = ({ loggedInUserData }) => {
     createGameLoading,
     activeGames,
     joinGame,
+    currentGameId
   } = useLobbyViewController(loggedInUserData);
 
   return (
@@ -49,6 +50,7 @@ const LobbyView: React.FC<LobbyProps> = ({ loggedInUserData }) => {
                 <button
                   className={styles.joinButton}
                   onClick={() => joinGame(game.gameId)}
+                  disabled={currentGameId === game.gameId}
                 >
                   Join
                 </button>

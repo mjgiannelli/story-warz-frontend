@@ -73,6 +73,7 @@ export const useLobbyViewController = (loggedInUserData: UserDTO) => {
           gameId: res.id,
           topic: topic,
           hostDisplayName: loggedInUserData.displayName,
+          book: book,
         });
         setTopic("");
         setBook(undefined);
@@ -153,5 +154,6 @@ export const useLobbyViewController = (loggedInUserData: UserDTO) => {
     createGameLoading,
     activeGames,
     joinGame,
+    currentGameId,
   };
 };

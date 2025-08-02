@@ -38,7 +38,7 @@ function App() {
     setLoggedInUser(loggedInUser);
   }, []);
 
-  if(loggedInUser === undefined) return (<LoadingComponent />);
+  if (loggedInUser === undefined) return <LoadingComponent />;
 
   return (
     <>
@@ -72,7 +72,7 @@ function App() {
           </Routes>
         </Router>
       ) : (
-        <SocketProvider>
+        <SocketProvider loggedInUser={loggedInUser}>
           <Router>
             <Routes>
               <Route

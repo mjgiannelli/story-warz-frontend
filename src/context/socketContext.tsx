@@ -7,6 +7,8 @@ import React, {
 } from "react";
 import { io, Socket } from "socket.io-client";
 import Auth from "../utilities/auth";
+import { Book, LoggedInUserProps } from "../App.interface";
+import { RoundDTO } from "../api/round/round.interface";
 
 export interface OnlineUser {
   socketId: string;
@@ -19,8 +21,12 @@ export interface OnlineUser {
 export interface ActiveGame {
   gameId: string;
   topic: string;
+  book: Book;
   hostDisplayName: string;
   players: string[];
+  currentRoundNum: number;
+  roundResults: RoundDTO[];
+  creatorId: string;
 }
 
 interface SocketContextType {
@@ -30,6 +36,7 @@ interface SocketContextType {
   currentGameId: string | null;
   joinGame: (gameId: string) => void;
   disconnectSocket: () => void;
+  currentPlayers: OnlineUser[]; // ✅ Add this
 }
 
 const SocketContext = createContext<SocketContextType | null>(null);
@@ -43,11 +50,18 @@ export const useSocketContext = () => {
   return context;
 };
 
-export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
+export const SocketProvider = ({
+  children,
+  loggedInUser,
+}: {
+  children: React.ReactNode;
+  loggedInUser: LoggedInUserProps | null;
+}) => {
   const [socket, setSocket] = useState<Socket | null>(null);
   const [onlineUsers, setOnlineUsers] = useState<OnlineUser[]>([]);
   const [currentGameId, setCurrentGameId] = useState<string | null>(null);
   const [activeGames, setActiveGames] = useState<ActiveGame[]>([]);
+  const [currentPlayers, setCurrentPlayers] = useState<OnlineUser[]>([]);
 
   const disconnectSocket = () => {
     if (socket) {
@@ -69,10 +83,36 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     if (!socket) return;
 
-    // Confirmed game join from server
-    const handleGameJoined = (gameId: string) => {
-      console.log("✅ Confirmed joined game:", gameId);
-      setCurrentGameId(gameId);
+    const handlePlayerJoinedGame = (user: OnlineUser) => {
+      console.log("🎮 Player joined game:", user);
+
+      // If current user joined, track the game they're in
+      if (loggedInUser && user.userId === loggedInUser.userId) {
+        setCurrentGameId(user.gameId ?? null);
+      }
+
+      // Sync the player list (prevent duplicates)
+      setCurrentPlayers((prev) => {
+        const exists = prev.some((p) => p.userId === user.userId);
+        return exists ? prev : [...prev, user];
+      });
+    };
+
+    const handleSyncPlayers = (players: OnlineUser[]) => {
+      console.log("🔄 Syncing full player list:", players);
+      setCurrentPlayers(players);
+    };
+
+    const handlePlayerLeftGame = (user: OnlineUser) => {
+      console.log("👋 Player left game:", user);
+
+      // If the user who left is me
+      if (loggedInUser && user.userId === loggedInUser.userId) {
+        setCurrentGameId(null);
+        setCurrentPlayers([]); // Reset players list
+      }
+
+      setCurrentPlayers((prev) => prev.filter((p) => p.userId !== user.userId));
     };
 
     const handleActiveGamesUpdate = (games: ActiveGame[]) => {
@@ -80,17 +120,36 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
       setActiveGames(games);
     };
 
-    socket.on("gameJoined", handleGameJoined);
+    const handleGameEnded = () => {
+      console.log("🛑 Game ended. Returning to profile...");
+      setCurrentGameId(null);
+      setCurrentPlayers([]);
+    };
+
+    const handlePlayerKicked = () => {
+      console.log("👢 You were removed from the game.");
+      setCurrentGameId(null);
+    };
+
     socket.on("activeGames", handleActiveGamesUpdate);
+    socket.on("gameEnded", handleGameEnded);
+    socket.on("playerKicked", handlePlayerKicked);
+    socket.on("playerJoinedGame", handlePlayerJoinedGame);
+    socket.on("playerJoinedGame", handlePlayerJoinedGame);
+    socket.on("playerLeftGame", handlePlayerLeftGame);
+    socket.on("syncPlayers", handleSyncPlayers);
 
     return () => {
-      socket.off("gameJoined", handleGameJoined);
       socket.off("activeGames", handleActiveGamesUpdate);
+      socket.off("gameEnded", handleGameEnded);
+      socket.off("playerKicked", handlePlayerKicked);
+      socket.off("playerJoinedGame", handlePlayerJoinedGame);
+      socket.off("playerLeftGame", handlePlayerLeftGame);
+      socket.off("syncPlayers", handleSyncPlayers);
     };
   }, [socket]);
 
   useEffect(() => {
-    const loggedInUser = Auth.loggedIn();
     if (!loggedInUser) {
       console.log("🔒 Not logged in, socket not initialized.");
       return;
@@ -128,7 +187,7 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
       setOnlineUsers([]);
       setActiveGames([]);
     };
-  }, []);
+  }, [loggedInUser]);
 
   const contextValue = useMemo(
     () => ({
@@ -138,8 +197,9 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
       currentGameId,
       joinGame,
       disconnectSocket,
+      currentPlayers, // ✅ Include here
     }),
-    [socket, onlineUsers, activeGames, currentGameId]
+    [socket, onlineUsers, activeGames, currentGameId, currentPlayers]
   );
 
   if (!socket) return null;
