@@ -4,6 +4,7 @@ import React, {
   useEffect,
   useState,
   useMemo,
+  useRef
 } from "react";
 import { io, Socket } from "socket.io-client";
 import Auth from "../utilities/auth";
@@ -34,6 +35,7 @@ interface SocketContextType {
   onlineUsers: OnlineUser[];
   activeGames: ActiveGame[];
   currentGameId: string | null;
+  gameStarted: boolean;
   joinGame: (gameId: string) => void;
   disconnectSocket: () => void;
   currentPlayers: OnlineUser[]; // ✅ Add this
@@ -62,12 +64,15 @@ export const SocketProvider = ({
   const [currentGameId, setCurrentGameId] = useState<string | null>(null);
   const [activeGames, setActiveGames] = useState<ActiveGame[]>([]);
   const [currentPlayers, setCurrentPlayers] = useState<OnlineUser[]>([]);
+  const [gameStarted, setGameStarted] = useState(false);
+  const currentGameIdRef = useRef<string | null>(null);
 
   const disconnectSocket = () => {
     if (socket) {
       socket.disconnect();
       setSocket(null);
       setCurrentGameId(null);
+      currentGameIdRef.current = null;
       setOnlineUsers([]);
       setActiveGames([]);
       console.log("🔌 Socket disconnected manually.");
@@ -89,6 +94,7 @@ export const SocketProvider = ({
       // If current user joined, track the game they're in
       if (loggedInUser && user.userId === loggedInUser.userId) {
         setCurrentGameId(user.gameId ?? null);
+        currentGameIdRef.current = user.gameId ?? null;
       }
 
       // Sync the player list (prevent duplicates)
@@ -109,6 +115,7 @@ export const SocketProvider = ({
       // If the user who left is me
       if (loggedInUser && user.userId === loggedInUser.userId) {
         setCurrentGameId(null);
+        currentGameIdRef.current = null;
         setCurrentPlayers([]); // Reset players list
       }
 
@@ -123,12 +130,25 @@ export const SocketProvider = ({
     const handleGameEnded = () => {
       console.log("🛑 Game ended. Returning to profile...");
       setCurrentGameId(null);
+      currentGameIdRef.current = null;
       setCurrentPlayers([]);
     };
 
     const handlePlayerKicked = () => {
       console.log("👢 You were removed from the game.");
       setCurrentGameId(null);
+    };
+
+    const handleGameStarted = ({ gameId }: { gameId: string }) => {
+      console.log("gameId: ", gameId);
+      console.log("currentGameId: ", currentGameIdRef.current);
+      if (gameId !== currentGameIdRef.current) return;
+      console.log(
+        "🚀 Game started for your game:",
+        gameId,
+        "Submit your stories"
+      );
+      setGameStarted(true);
     };
 
     socket.on("activeGames", handleActiveGamesUpdate);
@@ -138,6 +158,7 @@ export const SocketProvider = ({
     socket.on("playerJoinedGame", handlePlayerJoinedGame);
     socket.on("playerLeftGame", handlePlayerLeftGame);
     socket.on("syncPlayers", handleSyncPlayers);
+    socket.on("gameStarted", handleGameStarted);
 
     return () => {
       socket.off("activeGames", handleActiveGamesUpdate);
@@ -146,6 +167,7 @@ export const SocketProvider = ({
       socket.off("playerJoinedGame", handlePlayerJoinedGame);
       socket.off("playerLeftGame", handlePlayerLeftGame);
       socket.off("syncPlayers", handleSyncPlayers);
+      socket.off("gameStarted", handleGameStarted);
     };
   }, [socket]);
 
@@ -177,6 +199,7 @@ export const SocketProvider = ({
     socketInstance.on("playerRejoinedGame", (user: OnlineUser) => {
       console.log(`🔁 Rejoined game ${user.gameId}`);
       setCurrentGameId(user.gameId || null);
+      currentGameIdRef.current = user.gameId || null;
     });
 
     setSocket(socketInstance);
@@ -197,9 +220,10 @@ export const SocketProvider = ({
       currentGameId,
       joinGame,
       disconnectSocket,
-      currentPlayers, // ✅ Include here
+      currentPlayers,
+      gameStarted,
     }),
-    [socket, onlineUsers, activeGames, currentGameId, currentPlayers]
+    [socket, onlineUsers, activeGames, currentGameId, currentPlayers, gameStarted]
   );
 
   if (!socket) return null;
@@ -210,3 +234,4 @@ export const SocketProvider = ({
     </SocketContext.Provider>
   );
 };
+
