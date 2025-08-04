@@ -262,7 +262,7 @@ export const SocketProvider = ({
     }
 
     console.log("📡 Attempting socket connection...");
-    const socketInstance = io("http://localhost:3000");
+    const socketInstance = io(process.env.REACT_APP_API_URL);
 
     socketInstance.on("connect", () => {
       console.log("🟢 Connected to socket:", socketInstance.id);
