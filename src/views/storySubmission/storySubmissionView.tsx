@@ -1,6 +1,5 @@
-import React, { useState } from "react";
+import React from "react";
 import styles from "./storySubmissionView.module.scss";
-import { useSocketContext } from "../../context/socketContext";
 import { useStorySubmissionViewController } from "./storySubmissionViewController";
 import { UserDTO } from "../../api/user/user.interface";
 

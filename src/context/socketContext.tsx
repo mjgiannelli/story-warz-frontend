@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, {
   createContext,
   useContext,
@@ -7,7 +8,6 @@ import React, {
   useRef,
 } from "react";
 import { io, Socket } from "socket.io-client";
-import Auth from "../utilities/auth";
 import { Book, LoggedInUserProps, UserScore } from "../App.interface";
 import { PlayerVote, RoundDTO } from "../api/round/round.interface";
 import { StoryDTO } from "../api/story/story.interface";
@@ -253,7 +253,7 @@ export const SocketProvider = ({
       socket.off("showNextRound", handleShowNextRound);
       socket.off("gameEnded", handleGameEnded);
     };
-  }, [socket]);
+  }, [loggedInUser, socket]);
 
   useEffect(() => {
     if (!loggedInUser) {
@@ -314,21 +314,7 @@ export const SocketProvider = ({
       scoreBoard,
       scoreBoardUpdated,
     }),
-    [
-      socket,
-      onlineUsers,
-      activeGames,
-      currentGameId,
-      currentPlayers,
-      gameStarted,
-      submittedPlayers,
-      currentRound,
-      goToGamePlay,
-      playerVotes,
-      allPlayersVoted,
-      scoreBoard,
-      scoreBoardUpdated,
-    ]
+    [socket, onlineUsers, activeGames, currentGameId, joinGame, disconnectSocket, currentPlayers, gameStarted, submittedPlayers, currentRound, goToGamePlay, playerVotes, allPlayersVoted, scoreBoard, scoreBoardUpdated]
   );
 
   if (!socket) return null;

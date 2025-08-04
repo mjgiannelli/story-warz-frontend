@@ -7,8 +7,6 @@ export const useRevealStoryViewController = (loggedInUserData: UserDTO) => {
     socket,
     currentPlayers,
     currentGameId,
-    playerVotes,
-    allPlayersVoted,
     activeGames,
     currentRound,
     scoreBoard,

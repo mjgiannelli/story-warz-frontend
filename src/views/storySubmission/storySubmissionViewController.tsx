@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useSocketContext } from "../../context/socketContext";
 import { UserDTO } from "../../api/user/user.interface";
 

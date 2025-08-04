@@ -13,7 +13,6 @@ const LobbyView: React.FC<LobbyProps> = ({ loggedInUserData }) => {
     topic,
     setTopic,
     book,
-    setBook,
     handleCreateGame,
     retreiveGoogleBook,
     bookLoading,

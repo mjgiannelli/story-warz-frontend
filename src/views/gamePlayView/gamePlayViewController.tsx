@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { OnlineUser, useSocketContext } from "../../context/socketContext";
+import { useSocketContext } from "../../context/socketContext";
 import { UserDTO } from "../../api/user/user.interface";
 
 export const useGamePlayViewController = (loggedInUserData: UserDTO) => {
@@ -15,7 +15,6 @@ export const useGamePlayViewController = (loggedInUserData: UserDTO) => {
   } = useSocketContext();
 
   const [selectedVote, setSelectedVote] = useState<string | null>(null);
-  const [showScoreBoard, setShowScoreBoard] = useState<boolean>(false);
 
   const game = activeGames.find((g) => g.gameId === currentGameId);
   const host = loggedInUserData.displayName === game?.hostDisplayName;

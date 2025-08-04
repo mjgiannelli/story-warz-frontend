@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { useSocketContext, OnlineUser } from "../../context/socketContext";
-import { Book, LoggedInUserProps } from "../../App.interface";
+import { Book } from "../../App.interface";
 import { CreateGameDTO } from "../../api/game/game.interface";
 import { GameAPI } from "../../api/game/game.api";
 import { UserDTO } from "../../api/user/user.interface";
@@ -63,6 +63,7 @@ export const useLobbyViewController = (loggedInUserData: UserDTO) => {
       creatorId: loggedInUserData?.id as string,
       players: [loggedInUserData],
     };
+    setCreateGameLoading(true);
     try {
       const res = await GameAPI.createGame(gameData);
       console.log("create game res: ", res);
@@ -75,13 +76,16 @@ export const useLobbyViewController = (loggedInUserData: UserDTO) => {
           hostDisplayName: loggedInUserData.displayName,
           book: book,
         });
+        setCreateGameLoading(false);
         setTopic("");
         setBook(undefined);
         setShowModal(false);
       } else {
+        setCreateGameLoading(false);
         throw new Error("Failed to create game");
       }
     } catch (err) {
+      setCreateGameLoading(false);
       console.error("Error creating game:", err);
       toast.error("Failed to create game.");
     }

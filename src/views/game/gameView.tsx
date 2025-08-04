@@ -1,4 +1,3 @@
-import { RoundDTO } from "../../api/round/round.interface";
 import { LobbyProps } from "../../App.interface";
 import GamePlayView from "../gamePlayView/gamePlayView";
 import StorySubmissionView from "../storySubmission/storySubmissionView";
@@ -7,7 +6,6 @@ import { useGameViewController } from "./gameViewController";
 
 const GameView: React.FC<LobbyProps> = ({ loggedInUserData }) => {
   const {
-    currentGameId,
     game,
     currentPlayers,
     handleLeaveGame,
@@ -15,7 +13,6 @@ const GameView: React.FC<LobbyProps> = ({ loggedInUserData }) => {
     socket,
     gameStarted,
     goToGamePlay,
-    currentRound,
   } = useGameViewController(loggedInUserData);
 
   return (

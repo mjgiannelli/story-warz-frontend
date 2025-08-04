@@ -1,8 +1,5 @@
-import { useState, useEffect } from "react";
 import { UserDTO } from "../../api/user/user.interface";
-import { Book } from "../../App.interface";
 import { useSocketContext } from "../../context/socketContext";
-import Auth from "../../utilities/auth";
 
 export const useGameViewController = (loggedInUserData: UserDTO) => {
   const {

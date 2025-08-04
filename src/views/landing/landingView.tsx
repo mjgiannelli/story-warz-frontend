@@ -12,7 +12,7 @@ const LandingView: React.FC<NavProps> = ({ loggedInUser }) => {
     if (loggedInUser) {
       navigate("/profile");
     }
-  }, []);
+  }, [loggedInUser, navigate]);
 
   const handleClick = () => {
     const audio = new Audio("/intro.mp3");

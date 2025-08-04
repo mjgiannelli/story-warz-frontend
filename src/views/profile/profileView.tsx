@@ -2,16 +2,13 @@ import { NavProps } from "../../App.interface";
 import useProfileViewController from "./profileViewController";
 import styles from "./profileView.module.scss";
 import placeholderImage from "../../assets/images/placeholderImg.png";
-import { randomUUID } from "crypto";
 import LoadingComponent from "../../components/loading/loading";
 import LobbyView from "../lobby/lobbyView";
-import { useEffect } from "react";
-import socket from "../../socket/socket";
 import { UserDTO } from "../../api/user/user.interface";
 import GameView from "../game/gameView";
 
 const ProfileView: React.FC<NavProps> = ({ loggedInUser }) => {
-  const { profile, errorMessage, loading, handleLogout, currentGameId } =
+  const { profile, loading, handleLogout, currentGameId } =
     useProfileViewController(loggedInUser);
   return (
     <>
