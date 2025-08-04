@@ -1,0 +1,69 @@
+.revealContainer {
+  background-color: #1e1e2f;
+  color: #f0f0f5;
+  padding: 2rem;
+  border-radius: 12px;
+  max-width: 700px;
+  margin: 2rem auto;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.title {
+  text-align: center;
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+}
+
+.storyBox {
+  background-color: #29293d;
+  border-left: 6px solid #4caf50;
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+}
+
+.storyText {
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+  line-height: 1.5;
+}
+
+.storyOwner {
+  text-align: right;
+  font-style: italic;
+  color: #b5ffc9;
+}
+
+.scoreboard {
+  text-align: center;
+}
+
+.scoreboard h3 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.scoreList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.scoreItem {
+  display: flex;
+  justify-content: space-between;
+  background-color: #2f2f44;
+  margin: 0.5rem 0;
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+}
+
+.playerName {
+  font-weight: 500;
+}
+
+.points {
+  font-weight: bold;
+  color: #4caf50;
+}

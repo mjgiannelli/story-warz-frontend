@@ -8,7 +8,7 @@ import React, {
 } from "react";
 import { io, Socket } from "socket.io-client";
 import Auth from "../utilities/auth";
-import { Book, LoggedInUserProps } from "../App.interface";
+import { Book, LoggedInUserProps, UserScore } from "../App.interface";
 import { PlayerVote, RoundDTO } from "../api/round/round.interface";
 import { StoryDTO } from "../api/story/story.interface";
 
@@ -46,6 +46,8 @@ interface SocketContextType {
   goToGamePlay: boolean;
   playerVotes: PlayerVote[];
   allPlayersVoted: boolean;
+  scoreBoard: UserScore[];
+  scoreBoardUpdated: boolean;
 }
 
 const SocketContext = createContext<SocketContextType | null>(null);
@@ -78,6 +80,8 @@ export const SocketProvider = ({
   const [allPlayersVoted, setAllPlayersVoted] = useState<boolean>(false);
   const [currentRound, setCurrentRound] = useState<RoundDTO | undefined>();
   const [goToGamePlay, setGoToGameplay] = useState<boolean>(false);
+  const [scoreBoard, setScoreBoard] = useState<UserScore[]>([]);
+  const [scoreBoardUpdated, setScoreBoardUpdated] = useState<boolean>(false);
 
   const disconnectSocket = () => {
     if (socket) {
@@ -139,13 +143,6 @@ export const SocketProvider = ({
       setActiveGames(games);
     };
 
-    const handleGameEnded = () => {
-      console.log("🛑 Game ended. Returning to profile...");
-      setCurrentGameId(null);
-      currentGameIdRef.current = null;
-      setCurrentPlayers([]);
-    };
-
     const handlePlayerKicked = () => {
       console.log("👢 You were removed from the game.");
       setCurrentGameId(null);
@@ -174,7 +171,7 @@ export const SocketProvider = ({
     }: {
       roundVotes: PlayerVote[];
     }) => {
-      console.log('round votes: ', roundVotes);
+      console.log("round votes: ", roundVotes);
       setPlayerVotes(roundVotes);
     };
 
@@ -193,8 +190,40 @@ export const SocketProvider = ({
       setGoToGameplay(true);
     };
 
+    const handleScoreBoardUpdated = ({
+      scoreBoard,
+      scoreBoardUpdated,
+    }: {
+      scoreBoard: UserScore[];
+      scoreBoardUpdated: boolean;
+    }) => {
+      setScoreBoard(scoreBoard);
+      setScoreBoardUpdated(true);
+    };
+
+    const handleShowNextRound = ({ nextRound }: { nextRound: RoundDTO }) => {
+      setCurrentRound(nextRound);
+      setAllPlayersVoted(false);
+      setScoreBoardUpdated(false);
+      setPlayerVotes([]);
+    };
+
+    const handleGameEnded = () => {
+      console.log("🛑 Game has ended.");
+      setCurrentGameId(null);
+      currentGameIdRef.current = null;
+      setCurrentPlayers([]);
+      setGameStarted(false);
+      setSubmittedPlayers([]);
+      setCurrentRound(undefined);
+      setGoToGameplay(false);
+      setPlayerVotes([]);
+      setAllPlayersVoted(false);
+      setScoreBoard([]);
+      setScoreBoardUpdated(false);
+    };
+
     socket.on("activeGames", handleActiveGamesUpdate);
-    socket.on("gameEnded", handleGameEnded);
     socket.on("playerKicked", handlePlayerKicked);
     socket.on("playerJoinedGame", handlePlayerJoinedGame);
     socket.on("playerJoinedGame", handlePlayerJoinedGame);
@@ -205,10 +234,12 @@ export const SocketProvider = ({
     socket.on("startTheWar", handleGoToWar);
     socket.on("playerVoted", handlePlayerVoted);
     socket.on("allPlayersVoted", handleAllPlayersVoted);
+    socket.on("scoreBoardUpdated", handleScoreBoardUpdated);
+    socket.on("showNextRound", handleShowNextRound);
+    socket.on("gameEnded", handleGameEnded);
 
     return () => {
       socket.off("activeGames", handleActiveGamesUpdate);
-      socket.off("gameEnded", handleGameEnded);
       socket.off("playerKicked", handlePlayerKicked);
       socket.off("playerJoinedGame", handlePlayerJoinedGame);
       socket.off("playerLeftGame", handlePlayerLeftGame);
@@ -218,6 +249,9 @@ export const SocketProvider = ({
       socket.off("startTheWar", handleGoToWar);
       socket.off("playerVoted", handlePlayerVoted);
       socket.off("allPlayersVoted", handleAllPlayersVoted);
+      socket.off("scoreBoardUpdated", handleScoreBoardUpdated);
+      socket.off("showNextRound", handleShowNextRound);
+      socket.off("gameEnded", handleGameEnded);
     };
   }, [socket]);
 
@@ -277,6 +311,8 @@ export const SocketProvider = ({
       goToGamePlay,
       playerVotes,
       allPlayersVoted,
+      scoreBoard,
+      scoreBoardUpdated,
     }),
     [
       socket,
@@ -290,6 +326,8 @@ export const SocketProvider = ({
       goToGamePlay,
       playerVotes,
       allPlayersVoted,
+      scoreBoard,
+      scoreBoardUpdated,
     ]
   );
 

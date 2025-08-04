@@ -11,9 +11,11 @@ export const useGamePlayViewController = (loggedInUserData: UserDTO) => {
     allPlayersVoted,
     activeGames,
     currentRound,
+    scoreBoardUpdated,
   } = useSocketContext();
 
   const [selectedVote, setSelectedVote] = useState<string | null>(null);
+  const [showScoreBoard, setShowScoreBoard] = useState<boolean>(false);
 
   const game = activeGames.find((g) => g.gameId === currentGameId);
   const host = loggedInUserData.displayName === game?.hostDisplayName;
@@ -27,7 +29,7 @@ export const useGamePlayViewController = (loggedInUserData: UserDTO) => {
 
     socket?.emit("currentRoundPlayerVotes", {
       gameId: currentGameId,
-      roundNumber: 1,
+      roundNumber: currentRound?.roundNum,
       playerVote: {
         voterId: loggedInUserData.id,
         gameId: currentGameId,
@@ -43,9 +45,16 @@ export const useGamePlayViewController = (loggedInUserData: UserDTO) => {
   const handleRevealStory = () => {
     socket?.emit("revealStory", {
       gameId: currentGameId,
-      roundNumber: 1,
+      roundNumber: currentRound?.roundNum,
     });
   };
+
+  useEffect(() => {
+    console.log("updatedScoreBoard: ", scoreBoardUpdated);
+    if (scoreBoardUpdated) {
+      setSelectedVote(null);
+    }
+  }, [scoreBoardUpdated]);
 
   return {
     currentPlayers,
@@ -57,5 +66,6 @@ export const useGamePlayViewController = (loggedInUserData: UserDTO) => {
     playerVotes,
     allPlayersVoted,
     currentRound,
+    scoreBoardUpdated,
   };
 };

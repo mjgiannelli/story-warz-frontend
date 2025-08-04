@@ -1,3 +1,5 @@
+import { UserScore } from "../App.interface";
+
 export const isOnlyAlphabet = (string: string): boolean => {
     // Regular expression for checking only US alphabet letters and spaces
     const regex = /^[A-Za-z ]+$/;
@@ -88,4 +90,12 @@ export const formatDate = (date: Date | string): string => {
 // Function to count words in a string
 export const countWords = (str: string): number => {
   return str.trim().split(/\s+/).length;
+}
+
+export function getTopScorerId(scores: UserScore[]): string | null {
+  if (scores.length === 0) return null;
+
+  return scores.reduce((topScorer, current) =>
+    current.points > topScorer.points ? current : topScorer
+  ).userId;
 }
