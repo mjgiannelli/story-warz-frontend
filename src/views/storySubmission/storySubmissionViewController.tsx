@@ -1,10 +1,22 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSocketContext } from "../../context/socketContext";
+import { UserDTO } from "../../api/user/user.interface";
 
-export const useStorySubmissionViewController = (gameId: string) => {
-  const { socket } = useSocketContext();
+export const useStorySubmissionViewController = (
+  gameId: string,
+  loggedInUserData: UserDTO
+) => {
+  const {
+    socket,
+    currentPlayers,
+    submittedPlayers,
+    currentGameId,
+    activeGames,
+  } = useSocketContext();
   const [stories, setStories] = useState([""]);
   const [submitted, setSubmitted] = useState(false);
+
+  const game = activeGames.find((g) => g.gameId === currentGameId);
 
   const handleChange = (value: string, index: number) => {
     const updated = [...stories];
@@ -38,6 +50,14 @@ export const useStorySubmissionViewController = (gameId: string) => {
     setSubmitted(true);
   };
 
+  const host = loggedInUserData.displayName === game?.hostDisplayName;
+
+  const handleGoToWar = () => {
+    socket?.emit("goToWar", {
+      gameId,
+    });
+  };
+
   return {
     stories,
     handleAdd,
@@ -45,6 +65,9 @@ export const useStorySubmissionViewController = (gameId: string) => {
     handleRemove,
     handleSubmit,
     submitted,
-  }
-
+    submittedPlayers,
+    currentPlayers,
+    host,
+    handleGoToWar,
+  };
 };

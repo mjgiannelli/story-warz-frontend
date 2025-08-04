@@ -4,12 +4,13 @@ import React, {
   useEffect,
   useState,
   useMemo,
-  useRef
+  useRef,
 } from "react";
 import { io, Socket } from "socket.io-client";
 import Auth from "../utilities/auth";
 import { Book, LoggedInUserProps } from "../App.interface";
-import { RoundDTO } from "../api/round/round.interface";
+import { PlayerVote, RoundDTO } from "../api/round/round.interface";
+import { StoryDTO } from "../api/story/story.interface";
 
 export interface OnlineUser {
   socketId: string;
@@ -27,6 +28,7 @@ export interface ActiveGame {
   players: string[];
   currentRoundNum: number;
   roundResults: RoundDTO[];
+  stories: StoryDTO[];
   creatorId: string;
 }
 
@@ -39,6 +41,11 @@ interface SocketContextType {
   joinGame: (gameId: string) => void;
   disconnectSocket: () => void;
   currentPlayers: OnlineUser[]; // ✅ Add this
+  submittedPlayers: string[];
+  currentRound: RoundDTO | undefined;
+  goToGamePlay: boolean;
+  playerVotes: PlayerVote[];
+  allPlayersVoted: boolean;
 }
 
 const SocketContext = createContext<SocketContextType | null>(null);
@@ -66,6 +73,11 @@ export const SocketProvider = ({
   const [currentPlayers, setCurrentPlayers] = useState<OnlineUser[]>([]);
   const [gameStarted, setGameStarted] = useState(false);
   const currentGameIdRef = useRef<string | null>(null);
+  const [submittedPlayers, setSubmittedPlayers] = useState<string[]>([]);
+  const [playerVotes, setPlayerVotes] = useState<PlayerVote[]>([]);
+  const [allPlayersVoted, setAllPlayersVoted] = useState<boolean>(false);
+  const [currentRound, setCurrentRound] = useState<RoundDTO | undefined>();
+  const [goToGamePlay, setGoToGameplay] = useState<boolean>(false);
 
   const disconnectSocket = () => {
     if (socket) {
@@ -151,6 +163,36 @@ export const SocketProvider = ({
       setGameStarted(true);
     };
 
+    const handlePlayerSubmitted = ({ userId }: { userId: string }) => {
+      setSubmittedPlayers((prev) =>
+        prev.includes(userId) ? prev : [...prev, userId]
+      );
+    };
+
+    const handlePlayerVoted = ({
+      roundVotes,
+    }: {
+      roundVotes: PlayerVote[];
+    }) => {
+      console.log('round votes: ', roundVotes);
+      setPlayerVotes(roundVotes);
+    };
+
+    const handleAllPlayersVoted = ({
+      gameId,
+      allVoted,
+    }: {
+      gameId: string;
+      allVoted: boolean;
+    }) => {
+      setAllPlayersVoted(allVoted);
+    };
+
+    const handleGoToWar = ({ round }: { round: RoundDTO }) => {
+      setCurrentRound(round);
+      setGoToGameplay(true);
+    };
+
     socket.on("activeGames", handleActiveGamesUpdate);
     socket.on("gameEnded", handleGameEnded);
     socket.on("playerKicked", handlePlayerKicked);
@@ -159,6 +201,10 @@ export const SocketProvider = ({
     socket.on("playerLeftGame", handlePlayerLeftGame);
     socket.on("syncPlayers", handleSyncPlayers);
     socket.on("gameStarted", handleGameStarted);
+    socket.on("playerSubmitted", handlePlayerSubmitted);
+    socket.on("startTheWar", handleGoToWar);
+    socket.on("playerVoted", handlePlayerVoted);
+    socket.on("allPlayersVoted", handleAllPlayersVoted);
 
     return () => {
       socket.off("activeGames", handleActiveGamesUpdate);
@@ -168,6 +214,10 @@ export const SocketProvider = ({
       socket.off("playerLeftGame", handlePlayerLeftGame);
       socket.off("syncPlayers", handleSyncPlayers);
       socket.off("gameStarted", handleGameStarted);
+      socket.off("playerSubmitted", handlePlayerSubmitted);
+      socket.off("startTheWar", handleGoToWar);
+      socket.off("playerVoted", handlePlayerVoted);
+      socket.off("allPlayersVoted", handleAllPlayersVoted);
     };
   }, [socket]);
 
@@ -222,8 +272,25 @@ export const SocketProvider = ({
       disconnectSocket,
       currentPlayers,
       gameStarted,
+      submittedPlayers,
+      currentRound,
+      goToGamePlay,
+      playerVotes,
+      allPlayersVoted,
     }),
-    [socket, onlineUsers, activeGames, currentGameId, currentPlayers, gameStarted]
+    [
+      socket,
+      onlineUsers,
+      activeGames,
+      currentGameId,
+      currentPlayers,
+      gameStarted,
+      submittedPlayers,
+      currentRound,
+      goToGamePlay,
+      playerVotes,
+      allPlayersVoted,
+    ]
   );
 
   if (!socket) return null;
@@ -234,4 +301,3 @@ export const SocketProvider = ({
     </SocketContext.Provider>
   );
 };
-

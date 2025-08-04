@@ -11,6 +11,8 @@ export const useGameViewController = (loggedInUserData: UserDTO) => {
     currentPlayers,
     socket,
     gameStarted,
+    goToGamePlay,
+    currentRound
   } = useSocketContext();
 
   const game = activeGames.find((g) => g.gameId === currentGameId);
@@ -30,6 +32,8 @@ export const useGameViewController = (loggedInUserData: UserDTO) => {
     handleLeaveGame,
     host,
     socket,
-    gameStarted
+    gameStarted,
+    goToGamePlay,
+    currentRound
   };
 };

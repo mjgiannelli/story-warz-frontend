@@ -1,4 +1,6 @@
+import { RoundDTO } from "../../api/round/round.interface";
 import { LobbyProps } from "../../App.interface";
+import GamePlayView from "../gamePlayView/gamePlayView";
 import StorySubmissionView from "../storySubmission/storySubmissionView";
 import styles from "./gameView.module.scss";
 import { useGameViewController } from "./gameViewController";
@@ -12,12 +14,21 @@ const GameView: React.FC<LobbyProps> = ({ loggedInUserData }) => {
     host,
     socket,
     gameStarted,
+    goToGamePlay,
+    currentRound,
   } = useGameViewController(loggedInUserData);
 
   return (
     <div className={styles.container}>
-      {gameStarted ? (
-        <StorySubmissionView gameId={game?.gameId as string} />
+      {gameStarted && !goToGamePlay ? (
+        <StorySubmissionView
+          gameId={game?.gameId as string}
+          loggedInUserData={loggedInUserData}
+        />
+      ) : goToGamePlay ? (
+        <>
+          <GamePlayView loggedInUserData={loggedInUserData} />
+        </>
       ) : (
         <>
           <h2 className={styles.heading}>📚 Topic: {game?.topic}</h2>

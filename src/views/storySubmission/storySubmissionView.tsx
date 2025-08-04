@@ -2,12 +2,14 @@ import React, { useState } from "react";
 import styles from "./storySubmissionView.module.scss";
 import { useSocketContext } from "../../context/socketContext";
 import { useStorySubmissionViewController } from "./storySubmissionViewController";
+import { UserDTO } from "../../api/user/user.interface";
 
 interface Props {
   gameId: string;
+  loggedInUserData: UserDTO;
 }
 
-const StorySubmissionView: React.FC<Props> = ({ gameId }) => {
+const StorySubmissionView: React.FC<Props> = ({ gameId, loggedInUserData }) => {
   const {
     stories,
     handleAdd,
@@ -15,7 +17,11 @@ const StorySubmissionView: React.FC<Props> = ({ gameId }) => {
     handleRemove,
     handleSubmit,
     submitted,
-  } = useStorySubmissionViewController(gameId);
+    submittedPlayers,
+    currentPlayers,
+    host,
+    handleGoToWar,
+  } = useStorySubmissionViewController(gameId, loggedInUserData);
   return (
     <div className={styles.submissionContainer}>
       <h3>Submit 3–5 Stories</h3>
@@ -36,13 +42,37 @@ const StorySubmissionView: React.FC<Props> = ({ gameId }) => {
           + Add Story
         </button>
       )}
-      <button
-        onClick={handleSubmit}
-        className={styles.submitButton}
-        disabled={submitted}
-      >
-        {submitted ? "Submitted ✅" : "Submit Stories"}
-      </button>
+      {currentPlayers.length === submittedPlayers.length && host ? (
+        <>
+          <button onClick={handleGoToWar} className={styles.submitButton}>
+            Start the War!
+          </button>
+        </>
+      ) : currentPlayers.length === submittedPlayers.length ? (
+        <p>Prepare for War!</p>
+      ) : stories.length >= 3 ? (
+        <>
+          <button
+            onClick={handleSubmit}
+            className={styles.submitButton}
+            disabled={submitted}
+          >
+            {submitted ? "Submitted ✅" : "Submit Stories"}
+          </button>
+        </>
+      ) : null}
+
+      <h4>Players Submissions</h4>
+      <ul className={styles.playerList}>
+        {currentPlayers.map((p) => (
+          <li key={p.userId} className={styles.playerItem}>
+            {p.displayName}
+            {submittedPlayers.includes(p.userId) && (
+              <span className={styles.checkmark}>✅</span>
+            )}
+          </li>
+        ))}
+      </ul>
     </div>
   );
 };
