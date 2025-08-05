@@ -16,6 +16,7 @@ const GamePlayView: React.FC<LobbyProps> = ({ loggedInUserData }) => {
     host,
     currentRound,
     scoreBoardUpdated,
+    playerVoted,
   } = useGamePlayViewController(loggedInUserData);
 
   return (
@@ -59,9 +60,11 @@ const GamePlayView: React.FC<LobbyProps> = ({ loggedInUserData }) => {
                     </option>
                   ))}
               </select>
-              <button className={styles.lockInButton} onClick={handleLockIn}>
-                Lock In
-              </button>
+              {!playerVoted ? (
+                <button className={styles.lockInButton} onClick={handleLockIn}>
+                  Lock In
+                </button>
+              ) : null}
             </div>
 
             {allPlayersVoted && host && (

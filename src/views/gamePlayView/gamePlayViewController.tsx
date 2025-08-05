@@ -22,6 +22,10 @@ export const useGamePlayViewController = (loggedInUserData: UserDTO) => {
     setSelectedVote(userId);
   };
 
+  const playerVoted = playerVotes.find(
+    (pv) => pv.voterId === loggedInUserData.id
+  );
+
   const handleLockIn = () => {
     const selected = currentPlayers.find((u) => u.userId === selectedVote);
     if (!selected || !loggedInUserData || !currentGameId) return;
@@ -66,5 +70,6 @@ export const useGamePlayViewController = (loggedInUserData: UserDTO) => {
     allPlayersVoted,
     currentRound,
     scoreBoardUpdated,
+    playerVoted,
   };
 };

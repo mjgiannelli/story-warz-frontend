@@ -20,7 +20,6 @@ const RevealStoryView: React.FC<LobbyProps> = ({ loggedInUserData }) => {
       <h2 className={styles.title}>📖 Story Revealed!</h2>
 
       <div className={styles.storyBox}>
-        <p className={styles.storyText}>{currentRound?.story.content}</p>
         <p className={styles.storyOwner}>
           Story #{currentRound?.roundNum} belongs to: {storyOwner?.displayName}{" "}
           - @{storyOwner?.username}
@@ -28,7 +27,7 @@ const RevealStoryView: React.FC<LobbyProps> = ({ loggedInUserData }) => {
       </div>
 
       <div className={styles.scoreboard}>
-        <h3>🏆 {finalRound ? "Current" : "Final"} Scoreboard</h3>
+        <h3>🏆 {finalRound ? "Final" : "Current"} Scoreboard</h3>
         <ul className={styles.scoreList}>
           {scoreBoard.map((player) => {
             const playerInfo = currentPlayers.find(

@@ -226,7 +226,6 @@ export const SocketProvider = ({
     socket.on("activeGames", handleActiveGamesUpdate);
     socket.on("playerKicked", handlePlayerKicked);
     socket.on("playerJoinedGame", handlePlayerJoinedGame);
-    socket.on("playerJoinedGame", handlePlayerJoinedGame);
     socket.on("playerLeftGame", handlePlayerLeftGame);
     socket.on("syncPlayers", handleSyncPlayers);
     socket.on("gameStarted", handleGameStarted);

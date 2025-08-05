@@ -1,0 +1,40 @@
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #1a1d29;
+  padding: 1rem 2rem;
+  border-bottom: 2px solid #ff2e2e;
+  box-shadow: 0 2px 10px rgba(255, 46, 46, 0.3);
+  color: #f5f5f5;
+}
+
+.logoArea {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #ff2e2e;
+}
+
+.buttonGroup {
+  display: flex;
+  gap: 1rem;
+}
+
+.button {
+  padding: 0.5rem 1rem;
+  background-color: #ff2e2e;
+  color: white;
+  font-weight: bold;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.button:hover {
+  background-color: #e62222;
+}
+
+.swName {
+ font-size: 1.8rem;
+}
