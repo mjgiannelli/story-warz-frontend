@@ -19,7 +19,7 @@ const LobbyView: React.FC<LobbyProps> = ({ loggedInUserData }) => {
     createGameLoading,
     activeGames,
     joinGame,
-    currentGameId
+    currentGameId,
   } = useLobbyViewController(loggedInUserData);
 
   return (
@@ -41,19 +41,23 @@ const LobbyView: React.FC<LobbyProps> = ({ loggedInUserData }) => {
         ) : (
           <ul>
             {activeGames.map((game) => (
-              <li key={game.gameId} className={styles.gameCard}>
-                <div>
-                  <strong>📚 {game.topic}</strong>
-                  <div>Created by: {game.hostDisplayName}</div>
-                </div>
-                <button
-                  className={styles.joinButton}
-                  onClick={() => joinGame(game.gameId)}
-                  disabled={currentGameId === game.gameId}
-                >
-                  Join
-                </button>
-              </li>
+              <>
+                {!game.started ? (
+                  <li key={game.gameId} className={styles.gameCard}>
+                    <div>
+                      <strong>📚 {game.topic}</strong>
+                      <div>Created by: {game.hostDisplayName}</div>
+                    </div>
+                    <button
+                      className={styles.joinButton}
+                      onClick={() => joinGame(game.gameId)}
+                      disabled={currentGameId === game.gameId}
+                    >
+                      Join
+                    </button>
+                  </li>
+                ) : null}
+              </>
             ))}
           </ul>
         )}

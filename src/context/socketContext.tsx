@@ -30,6 +30,7 @@ export interface ActiveGame {
   roundResults: RoundDTO[];
   stories: StoryDTO[];
   creatorId: string;
+  started: boolean;
 }
 
 interface SocketContextType {
@@ -157,6 +158,10 @@ export const SocketProvider = ({
         gameId,
         "Submit your stories"
       );
+      const activeGame = activeGames.find((ag) => ag.gameId === gameId);
+      if (activeGame) {
+        activeGame.started = true;
+      }
       setGameStarted(true);
     };
 
@@ -313,7 +318,23 @@ export const SocketProvider = ({
       scoreBoard,
       scoreBoardUpdated,
     }),
-    [socket, onlineUsers, activeGames, currentGameId, joinGame, disconnectSocket, currentPlayers, gameStarted, submittedPlayers, currentRound, goToGamePlay, playerVotes, allPlayersVoted, scoreBoard, scoreBoardUpdated]
+    [
+      socket,
+      onlineUsers,
+      activeGames,
+      currentGameId,
+      joinGame,
+      disconnectSocket,
+      currentPlayers,
+      gameStarted,
+      submittedPlayers,
+      currentRound,
+      goToGamePlay,
+      playerVotes,
+      allPlayersVoted,
+      scoreBoard,
+      scoreBoardUpdated,
+    ]
   );
 
   if (!socket) return null;
