@@ -158,10 +158,6 @@ export const SocketProvider = ({
         gameId,
         "Submit your stories"
       );
-      const activeGame = activeGames.find((ag) => ag.gameId === gameId);
-      if (activeGame) {
-        activeGame.started = true;
-      }
       setGameStarted(true);
     };
 
