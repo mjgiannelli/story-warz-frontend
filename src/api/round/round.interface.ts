@@ -14,11 +14,7 @@ export interface PlayerVote {
 export interface RoundDTO {
   id: string;
   gameId: string;
-  fooledPlayerIds: string[];
-  correctPlayerIds: string[];
-  playerIds: string[];
   roundNum: number;
-  story: StoryDTO;
-  storyOwnerId: string;
+  storyContent: string;
   votes: PlayerVote[]
 };

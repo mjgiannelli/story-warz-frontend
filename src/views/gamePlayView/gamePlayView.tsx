@@ -27,7 +27,7 @@ const GamePlayView: React.FC<LobbyProps> = ({ loggedInUserData }) => {
         ) : (
           <>
             <h2>
-              Story #{currentRound?.roundNum}: {currentRound?.story.content}
+              Story #{currentRound?.roundNum}: {currentRound?.storyContent}
             </h2>
             <div className={styles.playersList}>
               {currentPlayers.map((player) => (

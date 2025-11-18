@@ -49,6 +49,7 @@ interface SocketContextType {
   allPlayersVoted: boolean;
   scoreBoard: UserScore[];
   scoreBoardUpdated: boolean;
+  currentRoundStoryOwnerId: string;
 }
 
 const SocketContext = createContext<SocketContextType | null>(null);
@@ -79,7 +80,11 @@ export const SocketProvider = ({
   const [submittedPlayers, setSubmittedPlayers] = useState<string[]>([]);
   const [playerVotes, setPlayerVotes] = useState<PlayerVote[]>([]);
   const [allPlayersVoted, setAllPlayersVoted] = useState<boolean>(false);
+  // need to remove data here that will show people the answers
+  // only send the content, gameId, createdDate
+  // have the server keep track of score
   const [currentRound, setCurrentRound] = useState<RoundDTO | undefined>();
+  const [currentRoundStoryOwnerId, setCurrentRoundStoryOwnerId] = useState<string>("");
   const [goToGamePlay, setGoToGameplay] = useState<boolean>(false);
   const [scoreBoard, setScoreBoard] = useState<UserScore[]>([]);
   const [scoreBoardUpdated, setScoreBoardUpdated] = useState<boolean>(false);
@@ -194,12 +199,15 @@ export const SocketProvider = ({
     const handleScoreBoardUpdated = ({
       scoreBoard,
       scoreBoardUpdated,
+      storyOwnerId,
     }: {
       scoreBoard: UserScore[];
       scoreBoardUpdated: boolean;
+      storyOwnerId: string;
     }) => {
       setScoreBoard(scoreBoard);
       setScoreBoardUpdated(true);
+      setCurrentRoundStoryOwnerId(storyOwnerId)
     };
 
     const handleShowNextRound = ({ nextRound }: { nextRound: RoundDTO }) => {
@@ -207,6 +215,7 @@ export const SocketProvider = ({
       setAllPlayersVoted(false);
       setScoreBoardUpdated(false);
       setPlayerVotes([]);
+      setCurrentRoundStoryOwnerId("")
     };
 
     const handleGameEnded = () => {
@@ -313,6 +322,7 @@ export const SocketProvider = ({
       allPlayersVoted,
       scoreBoard,
       scoreBoardUpdated,
+      currentRoundStoryOwnerId
     }),
     [
       socket,
@@ -330,6 +340,7 @@ export const SocketProvider = ({
       allPlayersVoted,
       scoreBoard,
       scoreBoardUpdated,
+      currentRoundStoryOwnerId
     ]
   );
 

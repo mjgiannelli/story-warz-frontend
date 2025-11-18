@@ -10,12 +10,13 @@ export const useRevealStoryViewController = (loggedInUserData: UserDTO) => {
     activeGames,
     currentRound,
     scoreBoard,
+    currentRoundStoryOwnerId
   } = useSocketContext();
   const game = activeGames.find((g) => g.gameId === currentGameId);
   console.log("game state on story reveal: ", game);
   const host = loggedInUserData.displayName === game?.hostDisplayName;
   const storyOwner = currentPlayers.find(
-    (cp) => cp.userId === currentRound?.story.ownerUserId
+    (cp) => cp.userId === currentRoundStoryOwnerId
   );
   const finalRound = currentRound?.roundNum === 8;
   const leaderId = getTopScorerId(scoreBoard);
