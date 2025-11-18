@@ -27,7 +27,7 @@ interface GoogleBooksApiResponse {
 }
 
 export const useLobbyViewController = (loggedInUserData: UserDTO) => {
-  const { socket, onlineUsers, activeGames, currentGameId, joinGame } =
+  const { socket, onlineUsers, activeGames, currentGameId, createGameError, setCreateGameError, joinGame } =
     useSocketContext();
   const [showModal, setShowModal] = useState(false);
   const [topic, setTopic] = useState("");
@@ -56,40 +56,42 @@ export const useLobbyViewController = (loggedInUserData: UserDTO) => {
   }, [socket]);
 
   const handleCreateGame = async () => {
-    const gameData: CreateGameDTO = {
-      book: book as Book,
-      createdDate: new Date().toISOString(),
-      topic: topic,
-      creatorId: loggedInUserData?.id as string,
-      players: [loggedInUserData],
-    };
     setCreateGameLoading(true);
+    setCreateGameError(null);
     try {
-      const res = await GameAPI.createGame(gameData);
-      console.log("create game res: ", res);
-      if (res?.id) {
-        toast.success("Game created successfully!");
-        console.log("socket: ", socket);
-        socket?.emit("newGameCreated", {
-          gameId: res.id,
-          topic: topic,
-          hostDisplayName: loggedInUserData.displayName,
-          book: book,
-        });
-        setCreateGameLoading(false);
-        setTopic("");
-        setBook(undefined);
-        setShowModal(false);
-      } else {
-        setCreateGameLoading(false);
-        throw new Error("Failed to create game");
-      }
+      // TODO: send to server to create game, and then send a message back
+      console.log("socket: ", socket);
+      socket?.emit("newGameCreated", {
+        createdDate: new Date().toISOString(),
+        topic: topic,
+        creatorId: loggedInUserData?.id as string,
+        players: [loggedInUserData],
+        hostDisplayName: loggedInUserData.displayName,
+        book: book,
+      });
     } catch (err) {
       setCreateGameLoading(false);
       console.error("Error creating game:", err);
       toast.error("Failed to create game.");
     }
   };
+
+  useEffect(() => {
+    if (!currentGameId) return;
+    toast.success("Game created successfully!");
+    // Successfully created or joined a game
+    setCreateGameLoading(false);
+    setTopic("");
+    setBook(undefined);
+    setShowModal(false);
+  }, [currentGameId]);
+
+  useEffect(() => {
+    if (!createGameError) return;
+    toast.success("Error creating Game. Try again!");
+    // Successfully created or joined a game
+    setCreateGameLoading(false);
+  }, [createGameError]);
 
   const retreiveGoogleBook = async () => {
     setBookLoading(true);

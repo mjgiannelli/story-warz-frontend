@@ -6,6 +6,8 @@ import React, {
   useState,
   useMemo,
   useRef,
+  Dispatch,
+  SetStateAction,
 } from "react";
 import { io, Socket } from "socket.io-client";
 import { Book, LoggedInUserProps, UserScore } from "../App.interface";
@@ -50,6 +52,8 @@ interface SocketContextType {
   scoreBoard: UserScore[];
   scoreBoardUpdated: boolean;
   currentRoundStoryOwnerId: string;
+  createGameError: string | null;
+  setCreateGameError: Dispatch<SetStateAction<string | null>>;
 }
 
 const SocketContext = createContext<SocketContextType | null>(null);
@@ -73,6 +77,7 @@ export const SocketProvider = ({
   const [socket, setSocket] = useState<Socket | null>(null);
   const [onlineUsers, setOnlineUsers] = useState<OnlineUser[]>([]);
   const [currentGameId, setCurrentGameId] = useState<string | null>(null);
+  const [createGameError, setCreateGameError] = useState<string | null>(null);
   const [activeGames, setActiveGames] = useState<ActiveGame[]>([]);
   const [currentPlayers, setCurrentPlayers] = useState<OnlineUser[]>([]);
   const [gameStarted, setGameStarted] = useState(false);
@@ -84,7 +89,8 @@ export const SocketProvider = ({
   // only send the content, gameId, createdDate
   // have the server keep track of score
   const [currentRound, setCurrentRound] = useState<RoundDTO | undefined>();
-  const [currentRoundStoryOwnerId, setCurrentRoundStoryOwnerId] = useState<string>("");
+  const [currentRoundStoryOwnerId, setCurrentRoundStoryOwnerId] =
+    useState<string>("");
   const [goToGamePlay, setGoToGameplay] = useState<boolean>(false);
   const [scoreBoard, setScoreBoard] = useState<UserScore[]>([]);
   const [scoreBoardUpdated, setScoreBoardUpdated] = useState<boolean>(false);
@@ -207,7 +213,7 @@ export const SocketProvider = ({
     }) => {
       setScoreBoard(scoreBoard);
       setScoreBoardUpdated(true);
-      setCurrentRoundStoryOwnerId(storyOwnerId)
+      setCurrentRoundStoryOwnerId(storyOwnerId);
     };
 
     const handleShowNextRound = ({ nextRound }: { nextRound: RoundDTO }) => {
@@ -215,7 +221,7 @@ export const SocketProvider = ({
       setAllPlayersVoted(false);
       setScoreBoardUpdated(false);
       setPlayerVotes([]);
-      setCurrentRoundStoryOwnerId("")
+      setCurrentRoundStoryOwnerId("");
     };
 
     const handleGameEnded = () => {
@@ -233,6 +239,10 @@ export const SocketProvider = ({
       setScoreBoardUpdated(false);
     };
 
+    const handleCreateGameError = ({ message }: { message: string }) => {
+      setCreateGameError(message);
+    };
+
     socket.on("activeGames", handleActiveGamesUpdate);
     socket.on("playerKicked", handlePlayerKicked);
     socket.on("playerJoinedGame", handlePlayerJoinedGame);
@@ -246,6 +256,7 @@ export const SocketProvider = ({
     socket.on("scoreBoardUpdated", handleScoreBoardUpdated);
     socket.on("showNextRound", handleShowNextRound);
     socket.on("gameEnded", handleGameEnded);
+    socket.on("gameCreateError", handleCreateGameError);
 
     return () => {
       socket.off("activeGames", handleActiveGamesUpdate);
@@ -261,6 +272,7 @@ export const SocketProvider = ({
       socket.off("scoreBoardUpdated", handleScoreBoardUpdated);
       socket.off("showNextRound", handleShowNextRound);
       socket.off("gameEnded", handleGameEnded);
+      socket.off("gameCreateError", handleCreateGameError);
     };
   }, [loggedInUser, socket]);
 
@@ -322,7 +334,9 @@ export const SocketProvider = ({
       allPlayersVoted,
       scoreBoard,
       scoreBoardUpdated,
-      currentRoundStoryOwnerId
+      currentRoundStoryOwnerId,
+      createGameError,
+      setCreateGameError,
     }),
     [
       socket,
@@ -340,7 +354,9 @@ export const SocketProvider = ({
       allPlayersVoted,
       scoreBoard,
       scoreBoardUpdated,
-      currentRoundStoryOwnerId
+      currentRoundStoryOwnerId,
+      createGameError,
+      setCreateGameError,
     ]
   );
 
